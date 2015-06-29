@@ -1,0 +1,321 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>WebGL: A crash course</title>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+  <style type="text/css">
+    body {
+      font-family: "Helvetica", "sans"
+    }
+    ul li {
+      font-size: 28px;
+      line-height: 34px;
+    }
+
+    .remark-code-line {
+      font-size: 15px;
+    }
+
+    img {
+      width: 100%;
+    }
+
+    .small img {
+      width: 50%;
+    }
+
+  </style>
+</head>
+<body>
+  <textarea id="source">
+
+class: center, middle
+
+# WebGL: A crash course
+
+---
+
+class: center, middle
+
+## Karl Kirch
+## @joekarl
+
+---
+
+class: center, middle
+
+# Before we start
+## A brief history of interactive graphics in the browser
+
+---
+
+## The plugin years (ie the 90s)
+
+* Flash
+* Java
+* ActiveX
+* Security problems
+* All we had :(
+
+---
+
+## SVG (2001)
+
+* Native in the browser
+* "Standards"
+* Somewhat interactive drawing
+
+---
+
+## Canvas (2004)
+
+* 2D API
+* Interactive drawing
+* RequestAnimationFrame
+* Rise of hardware acceleration
+
+---
+
+## WebGL (2011)
+
+* 3D API
+* Fast 2D
+* Per pixel effects
+* GPU access
+
+---
+
+class: center, middle
+
+# Current state of graphics
+
+---
+
+class: center, middle
+
+## Browser graphics != Native graphics
+
+---
+
+class: center, middle
+
+## What's holding us back?
+
+---
+
+class: center, middle
+
+## Javascript :(
+
+---
+
+class: center, middle
+
+### Slow computationally
+### Can't control memory usage
+
+---
+
+class: center, middle
+
+# WebGL makes things better!
+
+---
+
+class: center, middle
+
+# How?
+
+---
+
+class: center, middle
+
+# Move the work out of Javascript and put it on the GPU!
+
+---
+
+# WebGL == OpenGL ES 2.0 for the Web
+
+* Efficient use of the GPU
+* Introduced for low power, mobile devices
+* Stripped down version of OpenGL 2.0
+* https://www.khronos.org/webgl/
+
+---
+
+class: center, middle
+
+# Alright, enough talking!
+# Let's do some WebGL already!
+
+---
+
+class: center, middle
+# Nope
+
+![](Troll-face.png)
+
+---
+
+class: center, middle
+
+# Before that, let's talk about the GPU
+
+---
+
+## CPU v GPU
+
+* CPU
+  * Fast cores
+  * Few cores (consumer hardware ≈ 8)
+  * Direct memory access
+  * Good for generalized computation
+* GPU
+  * Slow cores
+  * Many cores (consumer hardware ≈ thousands)
+  * Dedicated video memory
+  * Good for parallel computation
+
+---
+
+class: center, middle
+
+![](cpu_vs_gpu.png)
+
+---
+
+class: center, middle
+
+### When in doubt, let the Mythbusters explain
+
+<iframe width="700" height="475" src="https://www.youtube.com/embed/-P28LKWTzrI" frameborder="0" allowfullscreen></iframe>
+
+---
+
+# This means we have to program differently than we normally do
+
+* We have to think differently
+* We're constrained in what we can do
+* We have to know how the GPU works
+* We're out of Javascript land
+
+---
+
+class: center, middle
+
+# WebGL exploits these differences (specifically parallelism)
+
+---
+
+class: center, middle
+
+# Ok, so WebGL now, Please?
+
+---
+
+class: center, middle
+##  Buffers, Vertices, and Shaders: Oh My!
+
+---
+
+class: center, middle
+
+## Buffer
+### A chunk of memory on the GPU
+
+![](array_buffer.png)
+
+---
+
+class: center, middle, small
+
+## Vertex
+### A Point in space
+
+![](vertices.gif)
+
+---
+
+class: center, middle
+
+## Shader
+### A program run on the GPU that describes the traits of a Vertex or a Pixel
+
+---
+
+## Vertex Shader
+
+* GLSL
+* Run per vertex
+* Get vertices from Buffer
+* Transform vertex in space
+* Setup data for fragment shaders
+* Per vertex values from attributes
+* Shared vertex values from uniforms
+
+---
+
+## Fragment Shader
+
+* GLSL
+* Run per pixel
+* Sets the color of the pixel
+* Can have information passed from vertex shader
+* Can sample textures (images) for color information
+* Per pixel values from varyings
+* Sharted pixel values from uniforms
+
+---
+
+# What every WebGL program has
+
+* A WebGL Context
+  * ```canvas.getContext('webgl')```
+* A Vertex Shader
+* A Fragment Shader
+* Code to setup Buffers
+
+---
+
+class: center, middle
+
+# [Bare Bones Example](examples/single_tri/index.html)
+
+---
+
+class: center, middle
+
+# [Color Blending Example](examples/color/index.html)
+
+---
+
+class: center, middle
+
+# [Texture Example](examples/texture/index.html)
+
+---
+
+class: center, middle
+
+# [Video Texture Example](examples/webcam/index.html)
+
+---
+
+class: center, middle
+
+# [Quad Example](examples/quad/index.html)
+
+---
+
+class: center, middle
+
+## Questions?
+
+  </textarea>
+  <script src="remark.min.js">
+  </script>
+  <script>
+    var slideshow = remark.create();
+  </script>
+</body>
+</html>
