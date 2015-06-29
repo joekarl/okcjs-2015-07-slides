@@ -1,4 +1,5 @@
 const canvas = document.getElementById("webglCanvas"),
+     videoEl = document.getElementById("webglVideoInput"),
           gl = canvas.getContext("webgl");
 
 // shaders
@@ -211,21 +212,7 @@ gl.bindBuffer(gl.ARRAY_BUFFER, textureCoordinatesBuffer);
 gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(textureCoordinates), gl.STATIC_DRAW);
 
 // Setup texture
-const texture = gl.createTexture();
-const textureImage = new Image();
-textureImage.loaded = false;
-textureImage.onload = function() {
-  gl.bindTexture(gl.TEXTURE_2D, texture);
-  gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, true);
-  gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, textureImage);
-  // texture isn't power of 2 so have to do texture linear filtering
-  gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
-  gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
-  gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
-  gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
-  textureImage.loaded = true;
-};
-textureImage.src = '../common/blue-bottom.jpg';
+const videoTexture = new VideoTexture(gl, videoEl);
 
 var xAngle = 0;
 var yAngle = 0;
@@ -251,7 +238,7 @@ function renderLoop() {
   mat4.identity(modelMatrix);
 
   mat4.rotateZ(rotateZMatrix, identityMatrix, zAngle * Math.PI / 180.0);
-  mat4.rotateY(rotateYMatrix, identityMatrix, yAngle * Math.PI / 180.0);
+  mat4.rotateY(rotateYMatrix, rotateZMatrix, yAngle * Math.PI / 180.0);
   mat4.rotateX(rotateXMatrix, rotateYMatrix, xAngle * Math.PI / 180.0);
   mat4.copy(modelMatrix, rotateXMatrix);
 
@@ -265,10 +252,8 @@ function renderLoop() {
   gl.bindBuffer(gl.ARRAY_BUFFER, colorCoordinatesBuffer);
   gl.vertexAttribPointer(colorCoordinateAttribute, 3, gl.FLOAT, false, 0, 0);
 
-  if (textureImage.loaded) {
-    gl.bindTexture(gl.TEXTURE_2D, texture);
-    gl.uniform1i(textureUniform, texture);
-  }
+  // update video texture
+  videoTexture.update(gl);
 
   gl.uniformMatrix4fv(modelMatrixUniform, false, modelMatrix);
 
@@ -278,5 +263,39 @@ function renderLoop() {
 
   requestAnimationFrame(renderLoop);
 }
+
+// Wrapper around texture + webcam video
+function VideoTexture(gl, videoEl) {
+  this.videoEl = videoEl;
+  this.isReady = false;
+  this.glTexture = gl.createTexture();
+
+  // Init video (note this doesn't work from local file, must be served from webserver)
+  navigator.getUserMedia({video: true}, function (stream) {
+    this.videoEl.src = (window.URL && window.URL.createObjectURL(stream)) || stream;
+    this.videoEl.width = 1024;
+    this.videoEl.height = 1024;
+    this.videoEl.play();
+    this.videoEl.addEventListener("canplay", function(){
+      gl.bindTexture(gl.TEXTURE_2D, this.glTexture);
+      gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, true);
+      gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, this.videoEl);
+      // video texture isn't power of 2 so have to do texture linear filtering
+      gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
+      gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
+      gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
+      gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
+      this.isReady = true;
+    }.bind(this));
+  }.bind(this), console.error);
+}
+
+// Update the texture if video is ready
+VideoTexture.prototype.update = function() {
+  if (this.isReady) {
+    gl.bindTexture(gl.TEXTURE_2D, this.glTexture);
+    gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, this.videoEl);
+  }
+};
 
 renderLoop();
