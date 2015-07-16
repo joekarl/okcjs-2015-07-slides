@@ -1,0 +1,79 @@
+# Blender MTL File: 'None'
+# Material Count: 7
+
+newmtl Material__1
+Ns 7.843137
+Ka 0.000000 0.000000 0.000000
+Kd 0.800000 0.800000 0.800000
+Ks 0.000000 0.000000 0.000000
+Ni 1.500000
+d 1.000000
+illum 2
+map_Kd Teal_TreesUVs.jpg
+map_Ka Teal_TreesUVs.jpg
+map_d Teal_TreesUVs_O.jpg
+
+newmtl Material__20
+Ns 7.843137
+Ka 0.000000 0.000000 0.000000
+Kd 0.470400 0.470400 0.470400
+Ks 0.000000 0.000000 0.000000
+Ni 1.500000
+d 1.000000
+illum 2
+map_Kd Blue_TrunkFungiUVs.jpg
+map_Ka Blue_TrunkFungiUVs.jpg
+
+newmtl Material__21
+Ns 7.843137
+Ka 0.000000 0.000000 0.000000
+Kd 0.470400 0.470400 0.470400
+Ks 0.000000 0.000000 0.000000
+Ni 1.500000
+d 1.000000
+illum 2
+map_Kd Black_BoulderUVs.jpg
+map_Ka Black_BoulderUVs.jpg
+
+newmtl Material__22
+Ns 7.843137
+Ka 0.000000 0.000000 0.000000
+Kd 0.470400 0.470400 0.470400
+Ks 0.000000 0.000000 0.000000
+Ni 1.500000
+d 1.000000
+illum 2
+map_Kd Pink_GRoundUVs.jpg
+map_Ka Pink_GRoundUVs.jpg
+
+newmtl Material__23
+Ns 7.843137
+Ka 0.000000 0.000000 0.000000
+Kd 0.470400 0.470400 0.470400
+Ks 0.000000 0.000000 0.000000
+Ni 1.500000
+d 1.000000
+illum 2
+map_Kd Red_SmallPlantsUVs.jpg
+map_Ka Red_SmallPlantsUVs.jpg
+map_d Red_SmallPlantsUVs_O.jpg
+
+newmtl Material__24
+Ns 7.843137
+Ka 0.000000 0.000000 0.000000
+Kd 0.505098 0.536471 0.561569
+Ks 0.000000 0.000000 0.000000
+Ni 1.500000
+d 1.000000
+illum 2
+map_Kd Map__22_Gradient.jpg
+
+newmtl Material__45
+Ns 7.843137
+Ka 0.000000 0.000000 0.000000
+Kd 0.000000 0.000000 0.000000
+Ks 0.000000 0.000000 0.000000
+Ni 1.500000
+d 1.000000
+illum 2
+map_Kd Map__22_Gradient.jpg
