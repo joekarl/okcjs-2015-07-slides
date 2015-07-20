@@ -159,14 +159,14 @@ window.onload = function() {
 <div>
   Vertex Shader
   <pre>
-attribute vec4 aVertex;
+attribute vec4 aVertexPosition;
 attribute vec4 aVertexColor;
 uniform mat4 uModelViewMatrix;
 varying vec4 vVertexColor;
 
 void main()
 {
-  gl_Position = modelViewMatrix * position;
+  gl_Position = uModelViewMatrix * aVertexPosition;
   vVertexColor = aVertexColor;
 }
   </pre>
