@@ -8,10 +8,9 @@ const vertexShader = compileShader(gl, gl.VERTEX_SHADER,
   attribute vec2 aTextureCoordinate;
   varying mediump vec2 vTextureCoordinate;
   uniform mat4 uModelMatrix;
-  uniform mat4 uCameraMatrix;
-				   
+
   void main() {
-    gl_Position = uModelMatrix * uCameraMatrix * vec4(aVertexCoordinate, 1.0);
+    gl_Position = uModelMatrix * vec4(aVertexCoordinate, 1.0);
     vTextureCoordinate = aTextureCoordinate;
   }
 `);
@@ -19,8 +18,10 @@ const fragmentShader = compileShader(gl, gl.FRAGMENT_SHADER,
 `
   uniform sampler2D uTexture;
   varying mediump vec2 vTextureCoordinate;
+
   void main() {
-    gl_FragColor = texture2D(uTexture, vTextureCoordinate);
+    mediump vec4 texColor = texture2D(uTexture, vTextureCoordinate);
+    gl_FragColor = texColor;
   }
 `);
 
@@ -32,7 +33,6 @@ const textureCoordinateAttribute = gl.getAttribLocation(program, "aTextureCoordi
 gl.enableVertexAttribArray(textureCoordinateAttribute);
 const textureUniform = gl.getUniformLocation(program, "uTexture");
 const modelMatrixUniform = gl.getUniformLocation(program, "uModelMatrix");
-const cameraMatrixUniform = gl.getUniformLocation(program, "uCameraMatrix");
 
 // Init gl information
 gl.useProgram(program);
@@ -47,20 +47,20 @@ var forestModel;
 
 ObjLoader.load(gl, 'tree_model/arvore.obj', 'tree_model/arvore.mtl', function(err, models) {
     if (err) {
-	return console.error(err);
+      return console.error(err);
     }
     treeModel = new ModelGroup(models);
     mat4.translate(treeModel.modelMatrix, mat4.clone(treeModel.modelMatrix), vec3.fromValues(-0.5, 0, 0));
     mat4.scale(treeModel.modelMatrix, mat4.clone(treeModel.modelMatrix), vec3.fromValues(0.2, 0.2, 0.2));
-    
+
     ObjLoader.load(gl, 'forest-scene/ForestSceneClean.obj', 'forest-scene/ForestScene.mtl', function(err, models) {
-	if (err) {
-	    return console.error(err);
-	}
-	forestModel = new ModelGroup(models);
-	mat4.translate(forestModel.modelMatrix, mat4.clone(forestModel.modelMatrix), vec3.fromValues(0.5, 0, 0));
-	mat4.scale(forestModel.modelMatrix, mat4.clone(forestModel.modelMatrix), vec3.fromValues(0.001, 0.001, 0.001));
-	requestAnimationFrame(renderLoop);
+      if (err) {
+          return console.error(err);
+      }
+      forestModel = new ModelGroup(models);
+      mat4.translate(forestModel.modelMatrix, mat4.clone(forestModel.modelMatrix), vec3.fromValues(0.5, 0, 0));
+      mat4.scale(forestModel.modelMatrix, mat4.clone(forestModel.modelMatrix), vec3.fromValues(0.001, 0.001, 0.001));
+      requestAnimationFrame(renderLoop);
     });
 });
 
@@ -76,13 +76,13 @@ function renderLoop() {
 
     mat4.rotateY(treeModel.modelMatrix, mat4.clone(treeModel.modelMatrix), 0.3 * Math.PI / 180);
     mat4.rotateY(forestModel.modelMatrix, mat4.clone(forestModel.modelMatrix), -0.3 * Math.PI / 180);
-    
+
     gl.clear(gl.COLOR_BUFFER_BIT);
 
-    treeModel.draw(gl, vertexCoordinateAttribute, textureCoordinateAttribute, textureUniform, modelMatrixUniform, cameraMatrixUniform, viewMatrix);
-    forestModel.draw(gl, vertexCoordinateAttribute, textureCoordinateAttribute, textureUniform, modelMatrixUniform, cameraMatrixUniform, viewMatrix);
- 
+    treeModel.draw(gl, vertexCoordinateAttribute, textureCoordinateAttribute, textureUniform,
+                   modelMatrixUniform, viewMatrix);
+    forestModel.draw(gl, vertexCoordinateAttribute, textureCoordinateAttribute, textureUniform,
+                     modelMatrixUniform, viewMatrix);
+
     requestAnimationFrame(renderLoop);
 }
-
-

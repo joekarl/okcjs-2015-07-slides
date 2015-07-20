@@ -1,321 +1,222 @@
-<!DOCTYPE html>
-<html>
-<head>
-  <title>WebGL: A crash course</title>
-  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
-  <style type="text/css">
-    body {
-      font-family: "Helvetica", "sans"
+<!DOCTYPE html><html><head><title>WebGL the hard way</title><meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0" /><style type='text/css'>
+body {
+  font-family:'Helvetica';
+  letter-spacing:-5px;
+  background:#000;
+  background-size:100%;
+  color:#fff;
+  margin:0;
+  padding:0;
+  font-weight:bold;
+}
+
+h1, h2, h3, p {
+  margin:0;
+}
+
+.red {
+  color: #FF0000;
+}
+
+.yellow {
+  color: #FFFF00;
+}
+
+.green {
+  color:#8dbd0c;
+}
+
+a {
+  background:#34d0e7;
+  color:#000;
+  text-decoration:none;
+}
+
+img {
+  width:100%;
+}
+
+div {
+  cursor:pointer;
+  cursor:hand;
+  position:absolute;
+  top:0px;
+  left:0px;
+  padding:75px;
+  line-height:97%;
+}
+
+div.center {
+  text-align:center;
+}
+
+div.imageText {
+  text-shadow:0px 0px 5px rgba(0,0,0,0.2);
+}
+
+.light {
+  color: #222;
+}
+
+notes {
+    display:none;
+}
+</style><script type='text/javascript'>
+window.onload = function() {
+    var s = document.getElementsByTagName('div'), ti;
+    if (!s) return;
+    var big = { current: 0, forward: fwd, reverse: rev, go: go, length: s.length };
+    window.big = big;
+    function resize() {
+        var w = window.innerWidth, h = window.innerHeight, e = s[big.current];
+        e.style.fontSize = h + 'px';
+        for (var i = h - 2; e.offsetWidth > w || e.offsetHeight > h; i -= 2) {
+            e.style.fontSize = i + 'px';
+        }
+        e.style.marginTop = ((h - e.offsetHeight) / 2) + 'px';
     }
-    ul li {
-      font-size: 28px;
-      line-height: 34px;
+    function go(n) {
+        big.current = n;
+        var e = s[n], t = parseInt(e.getAttribute('data-timeToNext') || 0, 10),
+            notes = e.getElementsByTagName('notes');
+        document.body.className = e.getAttribute('data-bodyclass') || '';
+        for (var k = 0; k < s.length; k++) s[k].style.display = 'none';
+        e.style.display = 'inline';
+        for (k = 0; typeof console === 'object' && k < notes.length; k++) console.log('%c%s: %s', 'padding:5px;font-family:serif;font-size:18px;line-height:150%;', n, notes[k].innerHTML.trim());
+        if (e.firstChild && e.firstChild.nodeName === 'IMG') {
+            document.body.style.backgroundImage = 'url("' + e.firstChild.src + '")';
+            e.firstChild.style.display = 'none';
+            if ('classList' in e) e.classList.add('imageText');
+        } else {
+            document.body.style.backgroundImage = '';
+            document.body.style.backgroundColor = e.style.backgroundColor;
+        }
+        if (ti !== undefined) window.clearInterval(ti);
+        if (t > 0) ti = window.setTimeout(fwd, (t * 1000));
+        resize();
+        if (window.location.hash !== n) window.location.hash = n;
+        document.title = e.textContent || e.innerText;
     }
-
-    .remark-code-line {
-      font-size: 15px;
+    document.onclick = function() { go(++big.current % (s.length)); };
+    function fwd() { go(Math.min(s.length - 1, ++big.current)); }
+    function rev() { go(Math.max(0, --big.current)); }
+    document.onkeydown = function(e) {
+        if (e.which === 39 || e.which === 34 || e.which === 40) fwd();
+        if (e.which === 37 || e.which === 33 || e.which === 38) rev();
+    };
+    document.ontouchstart = function(e) {
+        var x0 = e.changedTouches[0].pageX;
+        document.ontouchend = function(e2) {
+            var x1 = e2.changedTouches[0].pageX;
+            if (x1 - x0 < 0) fwd();
+            if (x1 - x0 > 0) rev();
+        };
+    };
+    function parse_hash() {
+        return Math.max(Math.min(s.length - 1,
+            parseInt(window.location.hash.substring(1), 10)), 0);
     }
-
-    img {
-      width: 100%;
-    }
-
-    .small img {
-      width: 50%;
-    }
-
-  </style>
-</head>
-<body>
-  <textarea id="source">
-
-class: center, middle
-
-# WebGL: A crash course
-
----
-
-class: center, middle
-
-## Karl Kirch
-## @joekarl
-
----
-
-class: center, middle
-
-# Before we start
-## A brief history of interactive graphics in the browser
-
----
-
-## The plugin years (ie the 90s)
-
-* Flash
-* Java
-* ActiveX
-* Security problems
-* All we had :(
-
----
-
-## SVG (2001)
-
-* Native in the browser
-* "Standards"
-* Somewhat interactive drawing
-
----
-
-## Canvas (2004)
-
-* 2D API
-* Interactive drawing
-* RequestAnimationFrame
-* Rise of hardware acceleration
-
----
-
-## WebGL (2011)
-
-* 3D API
-* Fast 2D
-* Per pixel effects
-* GPU access
-
----
-
-class: center, middle
-
-# Current state of graphics
-
----
-
-class: center, middle
-
-## Browser graphics != Native graphics
-
----
-
-class: center, middle
-
-## What's holding us back?
-
----
-
-class: center, middle
-
-## Javascript :(
-
----
-
-class: center, middle
-
-### Slow computationally
-### Can't control memory usage
-
----
-
-class: center, middle
-
-# WebGL makes things better!
-
----
-
-class: center, middle
-
-# How?
-
----
-
-class: center, middle
-
-# Move the work out of Javascript and put it on the GPU!
-
----
-
-# WebGL == OpenGL ES 2.0 for the Web
-
-* Efficient use of the GPU
-* Introduced for low power, mobile devices
-* Stripped down version of OpenGL 2.0
-* https://www.khronos.org/webgl/
-
----
-
-class: center, middle
-
-# Alright, enough talking!
-# Let's do some WebGL already!
-
----
-
-class: center, middle
-# Nope
-
-![](Troll-face.png)
-
----
-
-class: center, middle
-
-# Before that, let's talk about the GPU
-
----
-
-## CPU v GPU
-
-* CPU
-  * Fast cores
-  * Few cores (consumer hardware ≈ 8)
-  * Direct memory access
-  * Good for generalized computation
-* GPU
-  * Slow cores
-  * Many cores (consumer hardware ≈ thousands)
-  * Dedicated video memory
-  * Good for parallel computation
-
----
-
-class: center, middle
-
-![](cpu_vs_gpu.png)
-
----
-
-class: center, middle
-
-### When in doubt, let the Mythbusters explain
-
-<iframe width="700" height="475" src="https://www.youtube.com/embed/-P28LKWTzrI" frameborder="0" allowfullscreen></iframe>
-
----
-
-# This means we have to program differently than we normally do
-
-* We have to think differently
-* We're constrained in what we can do
-* We have to know how the GPU works
-* We're out of Javascript land
-
----
-
-class: center, middle
-
-# WebGL exploits these differences (specifically parallelism)
-
----
-
-class: center, middle
-
-# Ok, so WebGL now, Please?
-
----
-
-class: center, middle
-##  Buffers, Vertices, and Shaders: Oh My!
-
----
-
-class: center, middle
-
-## Buffer
-### A chunk of memory on the GPU
-
-![](array_buffer.png)
-
----
-
-class: center, middle, small
-
-## Vertex
-### A Point in space
-
-![](vertices.gif)
-
----
-
-class: center, middle
-
-## Shader
-### A program run on the GPU that describes the traits of a Vertex or a Pixel
-
----
-
-## Vertex Shader
-
-* GLSL
-* Run per vertex
-* Get vertices from Buffer
-* Transform vertex in space
-* Setup data for fragment shaders
-* Per vertex values from attributes
-* Shared vertex values from uniforms
-
----
-
-## Fragment Shader
-
-* GLSL
-* Run per pixel
-* Sets the color of the pixel
-* Can have information passed from vertex shader
-* Can sample textures (images) for color information
-* Per pixel values from varyings
-* Sharted pixel values from uniforms
-
----
-
-# What every WebGL program has
-
-* A WebGL Context
-  * ```canvas.getContext('webgl')```
-* A Vertex Shader
-* A Fragment Shader
-* Code to setup Buffers
-
----
-
-class: center, middle
-
-# [Bare Bones Example](examples/single_tri/index.html)
-
----
-
-class: center, middle
-
-# [Color Blending Example](examples/color/index.html)
-
----
-
-class: center, middle
-
-# [Texture Example](examples/texture/index.html)
-
----
-
-class: center, middle
-
-# [Video Texture Example](examples/webcam/index.html)
-
----
-
-class: center, middle
-
-# [Quad Example](examples/quad/index.html)
-
----
-
-class: center, middle
-
-## Questions?
-
-  </textarea>
-  <script src="remark.min.js">
-  </script>
-  <script>
-    var slideshow = remark.create();
-  </script>
+    if (window.location.hash) big.current = parse_hash() || big.current;
+    window.onhashchange = function() {
+        var c = parse_hash();
+        if (c !== big.current) go(c);
+    };
+    window.onresize = resize;
+    go(big.current);
+};
+</script></head><body>
+<div>WebGL the <em class="red">hard</em> way</div>
+<div>WebGL the <em class="yellow">hard</em> way</div>
+<div class="light"><img src="slideImages/cube.png" />WebGL ===</div>
+<div>The <span class="yellow">future</span> of high end graphics for the web</div>
+<div>The <span class="green">present</span> of high end graphics for the web</div>
+<div>But I have <span class="green">canvas</span> and <span class="green">SVG</span>, why do I need this?</div>
+<div>3D</div>
+<div><img src="slideImages/dataViz.png"/></div>
+<div><img src="slideImages/cad.png"/></div>
+<div><img src="slideImages/3dGames.png"/></div>
+<div>Fast 2D</div>
+<div><iframe width="700" height="475" src="https://www.youtube.com/embed/-P28LKWTzrI" frameborder="0" allowfullscreen></iframe></div>
+<div><img src="slideImages/mapbox.png"/></div>
+<div><img src="slideImages/2dGames.jpg"/></div>
+<div>WebGL == OpenGL</div>
+<div>
+  Summary: Why learn WebGL
+  <ul>
+    <li>3D</li>
+    <li>Performance</li>
+    <li>OpenGL</li>
+  </ul>
+</div>
+<div class="green">The Easy Way</div>
+<div>three.js<br />(3D)<br />Pixi.js<br />(2D)</div>
+<div class="red">The Hard Way</div>
+<div>WebGL is "<span class="yellow">complicated</span>"</div>
+<div><img src="slideImages/glDrawing.png" /></div>
+<div>A graphics pipeline</div>
+<div><img src="slideImages/graphicsPipeline.png" /></div>
+<div>Shaders</div>
+<div><img src="slideImages/shaders.png" /></div>
+<div>
+  Vertex Shader
+  <pre>
+attribute vec4 aVertex;
+attribute vec4 aVertexColor;
+uniform mat4 uModelViewMatrix;
+varying vec4 vVertexColor;
+
+void main()
+{
+  gl_Position = modelViewMatrix * position;
+  vVertexColor = aVertexColor;
+}
+  </pre>
+</div>
+
+<div>
+  Fragment Shader
+  <pre>
+
+varying vec4 vVertexColor;
+
+void main()
+{
+  gl_FragColor = vVertexColor;
+}
+  </pre>
+</div>
+<div>Buffers</div>
+<div><img src="oldSlides/array_buffer.png" /></div>
+<div>**Textures</div>
+<div><img src="slideImages/textureMap.png" /></div>
+<div>
+  <pre>
+
+varying mediump vec2 vTextureCoordinate;
+uniform sampler2D uTexture;
+
+void main()
+{
+  gl_FragColor = texture2D(uTexture, vTextureCoordinate);
+}
+  </pre>
+</div>
+<div>
+  Summary: How it works
+  <ul>
+    <li>Graphics Pipeline</li>
+    <li>Shaders</li>
+    <li>Buffers</li>
+  </ul>
+</div>
+<div class="green">Let's see it in action!</div>
+<div>
+  WebGL is:
+  <ul>
+    <li>Very powerful but low level</li>
+    <li><em>Faaaaaast</em></li>
+    <li>A valuable and very marketable skill</li>
+</div>
+<div>Questions?</div>
 </body>
 </html>

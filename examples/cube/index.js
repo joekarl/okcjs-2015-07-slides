@@ -24,8 +24,8 @@ const fragmentShader = compileShader(gl, gl.FRAGMENT_SHADER,
   varying mediump vec3 vColorCoordinate;
 
   void main() {
-    gl_FragColor = texture2D(uTexture, vTextureCoordinate);
-    //gl_FragColor = vec4(vColorCoordinate, 1);
+    //gl_FragColor = texture2D(uTexture, vTextureCoordinate);
+    gl_FragColor = vec4(vColorCoordinate, 1);
   }
 `);
 

@@ -34,8 +34,6 @@ const modelMatrixUniform = gl.getUniformLocation(program, "uModelMatrix");
 // Init gl information
 gl.useProgram(program);
 gl.clearColor(0.0, 0.0, 0.0, 1.0);
-gl.blendFunc(gl.SRC_ALPHA, gl.ONE);
-gl.enable(gl.BLEND);
 
 // Setup buffer
 const vertices = [
